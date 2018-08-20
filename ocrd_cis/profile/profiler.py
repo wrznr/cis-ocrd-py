@@ -3,7 +3,7 @@ from ocrd import Processor
 from ocrd_cis import get_ocrd_tool
 from ocrd.utils import getLogger
 from ocrd.model.ocrd_page import from_file
-from ocrd_cis import JavaProcess
+from .profilerprocess import ProfilerProcess
 
 
 class Profiler(Processor):
@@ -19,22 +19,19 @@ class Profiler(Processor):
         self.add_output_file(
             mimetype="application/json",
             content=json.dumps(profile),
-            basename="profile.json",
+            basename="profiler.json",
         )
 
     def read_profile(self):
         _input = []
         for (line, pcgts, ifile) in self.get_all_lines():
             _input.append(line.get_TextEquiv()[0].Unicode)
-        p = JavaProcess.profiler(
-             jar=self.parameter['cisOcrdJar'],
-             args=[
-                 self.parameter['profilerExecutable'],
-                 self.parameter['profilerBackend'],
-                 self.parameter['profilerLanguage'],
-             ]
+        p = ProfilerProcess(
+            exe=self.parameter['profilerExecutable'],
+            backend=self.parameter['profilerBackend'],
+            language=self.parameter['profilerLanguage'],
         )
-        return json.loads(p.run("\n".join(_input)))
+        return p.run("\n".join(_input))
 
     def get_all_lines(self):
         """Returns a list of tuples of lines, their parent and
