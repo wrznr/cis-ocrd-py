@@ -30,7 +30,7 @@ class JavaProcess:
                 stdout=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 # only since 3.6: encoding='utf-8',
-                # stderr=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
         ) as p:
             output, err = p.communicate(input=_input.encode('utf-8'))
             output = output.decode('utf-8')
