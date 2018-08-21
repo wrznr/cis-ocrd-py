@@ -99,6 +99,7 @@ class Aligner(Processor):
 
 class PageAlignment:
     """PageAlignment holds a list of LineAlignments."""
+
     def __init__(self, ifgs, ifs, process_output):
         """
         Create a page alignment from java-aligner's output.
@@ -171,6 +172,7 @@ class LineAlignment:
     master line with another. Pairwise aligned lines have always
     the same length. Underscores ('_') mark deletions or insertions.
     """
+
     def __init__(self, lines):
         """
         Create a LineAlignment from n-1 pairwise
