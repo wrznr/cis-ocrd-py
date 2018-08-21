@@ -64,8 +64,7 @@ class Aligner(Processor):
                 pa.add_line_alignments(line, current)
                 pa.add_word_alignments(line, current)
         self.log.debug("master basename: %s", master.basename)
-        self.add_output_file(
-            ID="{}_{}".format(master.ID, self.output_file_grp),
+        self.workspace.add_file(
             mimetype=MIMETYPE_PAGE,
             content=to_xml(pcgts),
             file_grp=self.output_file_grp,

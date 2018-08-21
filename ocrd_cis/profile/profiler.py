@@ -16,10 +16,11 @@ class Profiler(Processor):
 
     def process(self):
         jprofile = self.read_profile()
-        self.add_output_file(
+        self.workspace.add_file(
             mimetype="application/json",
             content=jprofile,
             basename="profiler.json",
+            file_grp=self.output_file_grp,
         )
 
     def read_profile(self):
