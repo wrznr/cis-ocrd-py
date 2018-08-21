@@ -15,10 +15,10 @@ class Profiler(Processor):
         self.log = getLogger('Processor.Profiler')
 
     def process(self):
-        profile = self.read_profile()
+        jprofile = self.read_profile()
         self.add_output_file(
             mimetype="application/json",
-            content=json.dumps(profile),
+            content=jprofile,
             basename="profiler.json",
         )
 

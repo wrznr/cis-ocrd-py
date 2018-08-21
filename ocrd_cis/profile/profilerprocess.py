@@ -36,7 +36,7 @@ class ProfilerProcess:
                     "cannot execute {}: {}\nreturned: {}"
                     .format(cmd, err.decode('utf-8') if err else u'', retval))
             output = output.decode('utf-8')
-            return json.loads(output)
+            return output
 
     def get_cmd(self):
         cmd = [
