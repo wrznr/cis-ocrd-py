@@ -10,9 +10,7 @@
 * tesserocr
 
 ### Virtualenv
-Don't forget to
-`source env/bin/activate`
-your virtualenv
+Don't forget to `source env/bin/activate` your virtualenv
 
 ### OCR-D workspace
 
@@ -22,7 +20,6 @@ python3.6 ocrd-wstool.py \
 /path/to/workspace/ \
 /path/to/folder containing gt-zips/
 ```
-
 
 ### Use Tesserocr on Workspace
 
@@ -34,5 +31,5 @@ ocrd-tesserocr-recognize \
 --parameter /path/to/parameter.json
 ```
 
-If you want to use different Models,
-name different output-file-groups and use the path to the specific parameter config file
+If you want to use different Models, name different output-file-groups
+and use the path to the specific parameter config file
