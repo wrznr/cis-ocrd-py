@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import shutil
 import subprocess
 from zipfile import ZipFile
@@ -9,9 +10,8 @@ python3.6 ocrd-wstool.py /path/to/workspace/ /path/to/folder containing zip file
 '''
 
 
-
 def unpack(fromdir, todir):
-    #extract all zips into temp dir
+    # extract all zips into temp dir
 
     path, dirs, files = os.walk(fromdir).__next__()
     for file in files:
@@ -26,41 +26,36 @@ def subprocess_cmd(command):
     print(out.decode('utf-8'))
 
 
-
-
 def main(argv):
 
-    #path to workspace
+    # path to workspace
     wsdir = argv[1]
     if not os.path.exists(wsdir):
         os.makedirs(wsdir)
 
-    #path to ground truth zip files
+    # path to ground truth zip files
     gtdir = argv[2]
 
-    #workspace id (optional)
-    #wsid = argv[3]
+    # workspace id (optional)
+    # wsid = argv[3]
 
     tempdir = gtdir + 'temp'
     fileprefix = 'file://'
 
-
-    #unpack zip files into temp file
+    # unpack zip files into temp file
     unpack(gtdir, tempdir)
 
     actualfolder = os.getcwd()
 
     os.chdir(wsdir)
 
-
     initcmd = 'ocrd workspace init {}'.format(wsdir)
     subprocess_cmd(initcmd)
 
-    #setidcmd = 'ocrd workspace set-id {}'.format(wsid)
-    #subprocess_cmd(setidcmd)
+    # setidcmd = 'ocrd workspace set-id {}'.format(wsid)
+    # subprocess_cmd(setidcmd)
 
-
-    #walk through unpacked zipfiles and add tifs and xmls to workspace
+    # walk through unpacked zipfiles and add tifs and xmls to workspace
     path, dirs, files = os.walk(tempdir).__next__()
     for d in dirs:
         filedir = os.path.join(tempdir, d, d)
@@ -69,12 +64,11 @@ def main(argv):
         for tif in tiffiles:
             if tif[-4:] == '.tif':
                 filename = tif[:-4]
-                
+
                 tifdir = os.path.join(filedir, tif)
-                xmldir = os.path.join(filedir, 'page', filename + '.xml') 
+                xmldir = os.path.join(filedir, 'page', filename + '.xml')
 
-
-                #add tif image to workspace
+                # add tif image to workspace
                 filegrp = 'OCR-D-IMG'
                 mimetype = 'image/tif'
                 fileid = filegrp + '-' + filename
@@ -103,12 +97,11 @@ def main(argv):
                 subprocess_cmd(xmlcmd)
 
 
-                #rename filepaths in xml into file-urls
+                # rename filepaths in xml into file-urls
                 sedcmd = '''
                 sed -i {fname}.xml -e 's#imageFilename="{tif}"#imageFilename="{fdir}"#'
                 '''.format(fname=wsdir+'OCR-D-XML/'+filename, tif=tif, fdir=fileprefix+wsdir+'OCR-D-IMG/'+tif)
                 subprocess_cmd(sedcmd)
-
 
     shutil.rmtree(tempdir)
 
