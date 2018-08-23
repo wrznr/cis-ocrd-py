@@ -32,4 +32,14 @@ ocrd-tesserocr-recognize \
 ```
 
 If you want to use different Models, name different output-file-groups
-and use the path to the specific parameter config file
+and use the path to the specific parameter config file. More
+information can be found
+[here](https://github.com/OCR-D/ocrd_tesserocr/blob/master/ocrd_tesserocr/ocrd-tool.json).
+Sample configuration file:
+
+```json
+{
+	"textequiv_level": "line",
+	"model": "deu-frak"
+}
+```
