@@ -7,7 +7,7 @@
 
 ### Essential OCR-D packages:
 * ocrd core or cis version
-* tesserocr
+* [ocrd_tesserocr](https://github.com/OCR-D/ocrd_tesserocr.git)
 
 ### Virtualenv
 Don't forget to `source env/bin/activate` your virtualenv
