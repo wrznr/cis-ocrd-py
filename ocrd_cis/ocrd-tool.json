@@ -45,6 +45,30 @@
 										"required": true
 								}
 						}
+				},
+				"ocrd-cis-ocr": {
+						"executable": "ocrd-cis-profile",
+						"categories": [
+								"Text recognition and optimization"
+						],
+						"steps": [
+								"postprocessing/alignment"
+						],
+						"description": "Create ground truth OCR",
+						"parameters": {
+								"zips": {
+										"type": ["string"],
+										"required": true
+								},
+								"baseURL": {
+										"type": "string",
+										"required": true
+								},
+								"cacheDir": {
+										"type": "string",
+										"required": true
+								}
+						}
 				}
 		}
 }
