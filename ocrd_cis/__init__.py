@@ -1,2 +1,2 @@
 from .javaprocess import JavaProcess
-from .ocrd_tool import get_ocrd_tool
+from .utils import get_ocrd_tool
