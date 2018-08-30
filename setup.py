@@ -19,6 +19,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'ocrd>=0.7.2',
+        'ocrd_tesserocr',
         'click',
     ],
     package_data={

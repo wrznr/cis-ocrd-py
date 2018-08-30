@@ -22,9 +22,9 @@ def unpack(fromdir, todir):
 
 
 def subprocess_cmd(command):
-    print("calling command {}".format(command.replace("\\s+", " ")))
+    print("calling command {}".format(command))
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-    out, err = process.communicate(command.encode('utf-8'))
+    out, err = process.communicate()#args)#command.encode('utf-8'))
     ret = process.wait()
     if ret != 0 or err is not None:
         raise Exception("error calling command: {} (returned {})"
@@ -55,8 +55,9 @@ def main(argv):
 
     os.chdir(wsdir)
 
-    initcmd = 'ocrd workspace init {}'.format(wsdir)
-    subprocess_cmd(initcmd)
+    #initcmd = 'ocrd workspace init {}'.format(wsdir)
+    #subprocess_cmd(initcmd)
+    subprocess.check_call(['ocrd workspace init ' + wsdir], shell=True)
 
     # setidcmd = 'ocrd workspace set-id {}'.format(wsid)
     # subprocess_cmd(setidcmd)
@@ -78,14 +79,22 @@ def main(argv):
                     mimetype = 'image/tif'
                     fileid = filegrp + '-' + filename
                     grpid = fileid
-                    imgcmd = '''ocrd workspace add \
-                    --file-grp {filegrp} \
-                    --file-id {fileid} \
-                    --group-id {grpid} \
-                    --mimetype {mimetype} \
-                    {fdir}'''.format(filegrp=filegrp, fileid=fileid, grpid=grpid,
-                                     mimetype=mimetype, fdir=tifdir)
-                    subprocess_cmd(imgcmd)
+                    subprocess_cmd(
+                        'ocrd workspace add',
+                        '--file-grp', filegrp,
+                        '--file-id', fileid,
+                        '--group-id', grpid,
+                        '--mimetype', mimetype,
+                        tifdir,
+                    )
+                    # imgcmd = 'ocrd workspace add',
+                    # --file-grp {filegrp} \
+                    # --file-id {fileid} \
+                    # --group-id {grpid} \
+                    # --mimetype {mimetype} \
+                    # {fdir}'''.format(filegrp=filegrp, fileid=fileid, grpid=grpid,
+                    #                  mimetype=mimetype, fdir=tifdir)
+                    # subprocess_cmd(imgcmd)
 
                     # add xml to workspace
                     filegrp = 'OCR-D-XML'
@@ -106,10 +115,9 @@ def main(argv):
                     sedcmd = '''
                     sed -i {fname} -e 's#imageFilename="{tif}"#imageFilename="{fdir}"#'
                     '''.format(fname=xmldir, tif=tif,
-                               fdir=fileprefix+wsdir+'OCR-D-IMG/'+tif)
-
+                               fdir=tifdir)  # fileprefix+wsdir+'OCR-D-IMG/'+tif)
                     subprocess_cmd(sedcmd)
-    shutil.rmtree(tempdir)
+    # shutil.rmtree(tempdir)
 
 
 if __name__ == '__main__':
