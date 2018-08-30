@@ -1,50 +1,84 @@
 {
-		"git_url": "https://github.com/cisocrgroup/cis-ocrd-py",
-		"version": "0.0.1",
-		"tools": {
-				"ocrd-cis-align": {
-						"executable": "ocrd-cis-align",
-						"categories": [
-								"Text recognition and optimization"
-						],
-						"steps": [
-								"postprocessing/alignment"
-						],
-						"description": "Align multiple OCRs and/or GTs",
-						"parameters": {
-								"cisOcrdJar": {
-										"type": "string",
-										"required": true
-								}
-						}
-				},
-				"ocrd-cis-profile": {
-						"executable": "ocrd-cis-profile",
-						"categories": [
-								"Text recognition and optimization"
-						],
-						"steps": [
-								"postprocessing/alignment"
-						],
-						"description": "Add correction suggestions to suspicious tokens",
-						"parameters": {
-								"cisOcrdJar": {
-										"type": "string",
-										"required": true
-								},
-								"profilerExecutable": {
-										"type": "string",
-										"required": true
-								},
-								"profilerBackend": {
-										"type": "string",
-										"required": true
-								},
-								"profilerLanguage": {
-										"type": "string",
-										"required": true
-								}
-						}
+	"git_url": "https://github.com/cisocrgroup/cis-ocrd-py",
+	"version": "0.0.1",
+	"tools": {
+		"ocrd-cis-align": {
+			"executable": "ocrd-cis-align",
+			"categories": [
+				"Text recognition and optimization"
+			],
+			"steps": [
+				"postprocessing/alignment"
+			],
+			"description": "Align multiple OCRs and/or GTs",
+			"parameters": {
+				"cisOcrdJar": {
+					"type": "string",
+					"required": true
 				}
+			}
+		},
+		"ocrd-cis-profile": {
+			"executable": "ocrd-cis-profile",
+			"categories": [
+				"Text recognition and optimization"
+			],
+			"steps": [
+				"postprocessing/alignment"
+			],
+			"description": "Add correction suggestions to suspicious tokens",
+			"parameters": {
+				"cisOcrdJar": {
+					"type": "string",
+					"required": true
+				},
+				"profilerExecutable": {
+					"type": "string",
+					"required": true
+				},
+				"profilerBackend": {
+					"type": "string",
+					"required": true
+				},
+				"profilerLanguage": {
+					"type": "string",
+					"required": true
+				}
+			}
+		},
+		"ocrd-cis-ocr": {
+			"executable": "ocrd-cis-ocr",
+			"categories": [
+				"Text recognition and optimization"
+			],
+			"steps": [
+				"postprocessing/alignment"
+			],
+			"description": "Create ground truth OCR",
+			"parameters": {
+				"ocrs": {
+					"type": "array",
+					"required": true,
+					"items": {
+						"type": "object",
+						"properties": {
+							"engine": {"type": "string", "required": true},
+							"models": {"type": "array", "items":{"type": "string"}}
+						}
+					}
+				},
+				"urls": {
+					"type": "array",
+					"required": true,
+					"items": [
+						{"type": "string"}
+					]
+				},
+				"cacheDir": {
+					"type": "string",
+					"required": true
+				}
+			}
 		}
+	}
 }
