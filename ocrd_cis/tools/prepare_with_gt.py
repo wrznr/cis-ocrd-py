@@ -14,18 +14,19 @@ from ocrd_cis import get_file_id
 from ocrd_cis import get_file_group_id
 import re
 
-class AddGTToWorkspace(Processor):
+
+class PrepareWithGT(Processor):
     ZIPS = ()
 
     def __init__(self, *args, **kwargs):
         ocrd_tool = get_ocrd_tool()
-        kwargs['ocrd_tool'] = ocrd_tool['tools']['ocrd-cis-add-gt-to-workspace']
+        kwargs['ocrd_tool'] = ocrd_tool['tools']['ocrd-cis-prepare-with-gt']
         kwargs['version'] = ocrd_tool['version']
-        super(AddGTToWorkspace, self).__init__(*args, **kwargs)
+        super(PrepareWithGT, self).__init__(*args, **kwargs)
         self.log = getLogger('cis.Processor.AddGTToWorkspace')
 
     def process(self):
-        for zip in AddGTToWorkspace.ZIPS:
+        for zip in PrepareWithGT.ZIPS:
             self._process(zip)
 
     def _process(self, zip):

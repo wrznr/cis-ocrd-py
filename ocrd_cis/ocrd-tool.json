@@ -46,7 +46,7 @@
 				}
 			}
 		},
-		"ocrd-cis-add-gt-to-workspace": {
+		"ocrd-cis-prepare-with-gt": {
 			"executable": "ocrd-cis-ocr",
 			"categories": [
 				"Text recognition and optimization"

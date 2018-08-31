@@ -6,6 +6,6 @@ from ocrd_cis.align.aligner import Aligner
 
 @click.command()
 @ocrd_cli_options
-def cis_ocrd_align(*args, **kwargs):
+def align(*args, **kwargs):
     # kwargs['cache_enabled'] = False
     return ocrd_cli_wrap_processor(Aligner, *args, **kwargs)
