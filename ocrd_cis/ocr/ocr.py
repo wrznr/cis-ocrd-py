@@ -5,7 +5,7 @@ from ocrd.model.ocrd_page import to_xml
 from ocrd.model.ocrd_page_generateds import parseString
 from ocrd.utils import getLogger
 from ocrd_cis import get_file_id
-from ocrd_cis import get_group_id
+from ocrd_cis import get_file_group_id
 from ocrd_cis import get_ocrd_tool
 from ocrd_tesserocr import TesserocrRecognize
 from pathlib import Path
@@ -143,14 +143,13 @@ class OCR(Processor):
         """Return a pair of the group and file id for a given zip archive"""
         suffix = os.path.splitext(os.path.basename(zip))[0]
         if _type == "IMG":
-            return (get_group_id("IMG", suffix=suffix),
+            return (get_file_group_id("IMG", suffix=suffix),
                     get_file_id(_id, "IMG", suffix=suffix))
         elif _type == "SEG":
-            return (get_group_id("SEG", suffix=suffix),
+            return (get_file_group_id("SEG", suffix=suffix),
                     get_file_id(_id, "SEG", suffix=suffix))
-        else:
-            return (get_group_id("COR", gt=True, suffix=suffix),
-                    get_file_id(_id, "COR", gt=True, suffix=suffix))
+        return (get_file_group_id("COR", gt=True, suffix=suffix),
+                get_file_id(_id, "COR", gt=True, suffix=suffix))
 
     def download_all_archives(self):
         zips = list()
