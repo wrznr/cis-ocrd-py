@@ -2,6 +2,7 @@
 Installs:
     - ocrd-cis-align
     - ocrd-cis-profile
+    - ocr-cis-prepare-with-gt
 """
 
 from setuptools import setup
