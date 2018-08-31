@@ -30,7 +30,6 @@ setup(
         'console_scripts': [
             'ocrd-cis-align=ocrd_cis.align.cli:align',
             'ocrd-cis-profile=ocrd_cis.profile.cli:profile',
-            'ocrd-cis-ocr=ocrd_cis.ocr.cli:ocr',
             'ocrd-cis-prepare-with-gt=ocrd_cis.tools.cli:prepare_with_gt',
         ]
     },

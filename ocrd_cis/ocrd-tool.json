@@ -56,40 +56,6 @@
 			],
 			"description": "Prepare workspace with ground-truth archive",
 			"parameters": {}
-		},
-		"ocrd-cis-ocr": {
-			"executable": "ocrd-cis-ocr",
-			"categories": [
-				"Text recognition and optimization"
-			],
-			"steps": [
-				"postprocessing/alignment"
-			],
-			"description": "Create ground truth OCR",
-			"parameters": {
-				"ocrs": {
-					"type": "array",
-					"required": true,
-					"items": {
-						"type": "object",
-						"properties": {
-							"engine": {"type": "string", "required": true},
-							"models": {"type": "array", "items":{"type": "string"}}
-						}
-					}
-				},
-				"urls": {
-					"type": "array",
-					"required": true,
-					"items": [
-						{"type": "string"}
-					]
-				},
-				"cacheDir": {
-					"type": "string",
-					"required": true
-				}
-			}
 		}
 	}
 }
