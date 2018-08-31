@@ -87,14 +87,7 @@ class PrepareWithGT(Processor):
 
             # segments (parse xml and remove all TextEquivs)
             pcgts = parseString(content, silence=True)
-            for region in pcgts.get_Page().get_TextRegion():
-                region.TextEquiv = []
-                for line in region.get_TextLine():
-                    line.TextEquiv = []
-                    for word in line.get_Word():
-                        word.TextEquiv = []
-                        for glyph in word.get_Glyph():
-                            glyph.TextEquiv = []
+            self._clear(pcgts)
             self.workspace.add_file(
                 ID=sid,
                 file_grp=sfg,
@@ -103,3 +96,9 @@ class PrepareWithGT(Processor):
                 basename=basename(pair[1]),
                 content=to_xml(pcgts),
             )
+
+    def _clear(self, pcgts):
+        for region in pcgts.get_Page().get_TextRegion():
+            region.TextEquiv = []
+            for line in region.get_TextLine():
+                line.Word = []
