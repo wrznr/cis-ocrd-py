@@ -46,6 +46,17 @@
 				}
 			}
 		},
+		"ocrd-cis-add-gt-to-workspace": {
+			"executable": "ocrd-cis-ocr",
+			"categories": [
+				"Text recognition and optimization"
+			],
+			"steps": [
+				"postprocessing/alignment"
+			],
+			"description": "Prepare workspace with ground-truth archive",
+			"parameters": {}
+		},
 		"ocrd-cis-ocr": {
 			"executable": "ocrd-cis-ocr",
 			"categories": [
