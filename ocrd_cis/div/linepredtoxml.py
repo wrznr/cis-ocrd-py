@@ -90,17 +90,20 @@ class LptXML(Processor):
                 dummyRegion.add_TextLine(textline)
 
 
-            ID = self.output_file_grp
+            output_file_grp = '-'.join(['OCR-D',mainfolder,dir])
+            ID = output_file_grp
 
             self.log.info('creating file id: %s, name: %s, file_grp: %s', 
             ID, input_file.basename, self.output_file_grp)
 
             # Use the input file's basename for the new file
             # this way the files retain the same basenames.
+
+
             out = self.workspace.add_file(
                 ID=ID,
-                file_grp=self.output_file_grp,
-                basename=self.output_file_grp + '-' + input_file.basename,
+                file_grp=output_file_grp,
+                basename=output_file_grp + '.xml',
                 mimetype=MIMETYPE_PAGE,
                 local_filename="%s/%s.xml" % (self.output_file_grp, ID),
                 content=to_xml(pcgts).encode('utf-8')
