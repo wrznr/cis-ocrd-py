@@ -1,0 +1,5 @@
+cmake
+libxerces-c-dev
+libcppunit-dev
+jq
+maven
