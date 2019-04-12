@@ -14,7 +14,7 @@ COPY bashlib/ocrd-cis-lib.sh \
 	bashlib/ocrd-cis-docker-train.sh\
 	bashlib/ocrd-cis-post-correct.sh\
 	/apps/
-COPY data/docker/ocrd-cis-postcorrection.json\
+COPY data/docker/ocrd-cis-post-correction.json\
 	data/docker/ocrd-cis-ocropy-frakur1.json\
 	data/docker/ocrd-cis-ocropy-frakur2.json\
 	${DATA}/config
