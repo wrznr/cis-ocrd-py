@@ -1,0 +1,10 @@
+{
+"model": "${DATA}/models/model.zip",
+"jar": "/apps/ocrd-cis.jar",
+"ocr": [
+{
+"type": "ocropy",
+"path": "${DATA}/config/ocrd-cis-ocropy-fraktur1.json"
+}
+]
+}

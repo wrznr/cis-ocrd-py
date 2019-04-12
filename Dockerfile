@@ -64,8 +64,6 @@ RUN mkdir ${DATA}/models &&\
 	wget cis.lmu.de/~finkf/fraktur2-00062000.pyrnn.gz
 
 # TODOS:
-# - add configuration files
-# - add ocr-models
 # - implement/adjust training script
 # - implement helper post-correction script
 ENTRYPOINT ["/bin/sh", "-c"]
