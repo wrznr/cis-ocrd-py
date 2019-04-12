@@ -15,8 +15,8 @@ COPY bashlib/ocrd-cis-lib.sh \
 	bashlib/ocrd-cis-post-correct.sh\
 	/apps/
 COPY data/docker/ocrd-cis-post-correction.json\
-	data/docker/ocrd-cis-ocropy-frakur1.json\
-	data/docker/ocrd-cis-ocropy-frakur2.json\
+	data/docker/ocrd-cis-ocropy-fraktur1.json\
+	data/docker/ocrd-cis-ocropy-fraktur2.json\
 	${DATA}/config
 RUN sed -i -e "s/\${DATA}/${DATA}/g" ${DATA/config/*.json
 
