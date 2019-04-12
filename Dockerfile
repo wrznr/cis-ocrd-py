@@ -17,7 +17,7 @@ COPY bashlib/ocrd-cis-lib.sh \
 COPY data/docker/ocrd-cis-post-correction.json\
 	data/docker/ocrd-cis-ocropy-fraktur1.json\
 	data/docker/ocrd-cis-ocropy-fraktur2.json\
-	${DATA}/config
+	${DATA}/config/
 RUN sed -i -e "s/\${DATA}/${DATA}/g" ${DATA/config/*.json
 
 # install the profiler
