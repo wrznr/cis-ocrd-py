@@ -28,6 +28,22 @@ ocrd-cis-getopt() {
 	exit 1
 }
 
+# Parse command line arguments.  Sets PARAMETER, INPUT_FILE_GRP,
+# OUTPUT_FILE_GRP and METS to the according values.  Usage:
+# `ocrd-cis-getopt $*`.
+ocrd-cis-getopt-new() {
+	while [[ $# -gt 0 ]]; do
+		case $1 in
+			-P|--parameter) PARAMETER=$2; shift; shift;;
+			-M|--mets) METS=$2; shift; shift;;
+			-I|--input-file-grp) INPUT_FILE_GRP=$2; shift; shift;;
+			-O|--output-file-grp) OUTPUT_FILE_GRP=$2; shift; shift;;
+			--log-level) LOG_LEVEL=$2; shift; shift;;
+			*) shift;;
+		esac
+	done
+}
+
 # Download the ocrd.jar if it does not exist.
 ocrd-cis-download-jar() {
 	if [[ -f "$1" ]]; then
