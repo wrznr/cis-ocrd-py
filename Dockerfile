@@ -9,13 +9,18 @@ COPY data/docker/deps.txt ${DATA}/deps.txt
 RUN apt-get update && \
 	apt-get -y install --no-install-recommends $(cat ${DATA}/deps.txt)
 
-# cis-ocrd scripts and configuration
-COPY bashlib/ocrd-cis-lib.sh /apps/
-COPY bashlib/ocrd-cis-docker-train.sh /apps/
-COPY bashlib/ocrd-cis-post-correct.sh /apps/
-# COPY data/docker/train.json /${DATA}/
-# COPY data/docker/train.json /${DATA}/
-# COPY data/docker/train.json /${DATA}/
+# copy cis-ocrd scripts and configuration
+COPY [
+	"bashlib/ocrd-cis-lib.sh",
+	"bashlib/ocrd-cis-docker-train.sh"
+	"bashlib/ocrd-cis-post-correct.sh"
+	"/apps/"]
+COPY [
+	"data/docker/ocrd-cis-postcorrection.json",
+	"data/docker/ocrd-cis-ocropy-frakur1.json",
+	"data/docker/ocrd-cis-ocropy-frakur2.json",
+	${DATA}/config]
+RUN sed -i -e "s/\${DATA}/${DATA}/g" ${DATA/config/*.json
 
 # install the profiler
 RUN	git clone ${GITURL}/Profiler --branch devel --single-branch /tmp/profiler &&\
