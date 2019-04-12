@@ -2,19 +2,20 @@ FROM ocrd/core:latest
 VOLUME ["/data"]
 ENV VERSION="Di 2. Apr 17:50:22 CEST 2019"
 ENV GITURL="https://github.com/cisocrgroup"
+ENV DATA="/data/ocrd-cis-post-correction"
 
 # deps
-COPY data/docker/deps.txt /ocrd-cis-post-correction/deps.txt
+COPY data/docker/deps.txt ${DATA}/deps.txt
 RUN apt-get update && \
-	apt-get -y install --no-install-recommends $(cat /ocrd-cis-post-correction/deps.txt)
+	apt-get -y install --no-install-recommends $(cat ${DATA}/deps.txt)
 
 # cis-ocrd scripts and configuration
 COPY bashlib/ocrd-cis-lib.sh /apps/
 COPY bashlib/ocrd-cis-docker-train.sh /apps/
 COPY bashlib/ocrd-cis-post-correct.sh /apps/
-# COPY data/docker/train.json /ocrd-cis-post-correction/
-# COPY data/docker/train.json /ocrd-cis-post-correction/
-# COPY data/docker/train.json /ocrd-cis-post-correction/
+# COPY data/docker/train.json /${DATA}/
+# COPY data/docker/train.json /${DATA}/
+# COPY data/docker/train.json /${DATA}/
 
 # install the profiler
 RUN	git clone ${GITURL}/Profiler --branch devel --single-branch /tmp/profiler &&\
@@ -31,8 +32,8 @@ RUN	git clone ${GITURL}/Profiler --branch devel --single-branch /tmp/profiler &&
 RUN	git clone ${GITURL}/Resources --branch master --single-branch /tmp/resources &&\
 	cd /tmp/resources/lexica &&\
 	make FBDIC=/apps/compileFBDic TRAIN=/apps/trainFrequencyList &&\
-	mkdir -p /ocrd-cis-post-correction/languages &&\
-	cp -r german latin greek german.ini latin.ini greek.ini /ocrd-cis-post-correction/languages &&\
+	mkdir -p /${DATA}/languages &&\
+	cp -r german latin greek german.ini latin.ini greek.ini /${DATA}/languages &&\
 	cd / &&\
 	rm -rf /tmp/resources
 
