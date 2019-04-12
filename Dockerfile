@@ -10,14 +10,14 @@ RUN apt-get update && \
 	apt-get -y install --no-install-recommends $(cat ${DATA}/deps.txt)
 
 # copy cis-ocrd scripts and configuration
-COPY ["bashlib/ocrd-cis-lib.sh",
-	"bashlib/ocrd-cis-docker-train.sh",
-	"bashlib/ocrd-cis-post-correct.sh",
-	"/apps/"]
-COPY ["data/docker/ocrd-cis-postcorrection.json",
-	"data/docker/ocrd-cis-ocropy-frakur1.json",
-	"data/docker/ocrd-cis-ocropy-frakur2.json",
-	${DATA}/config]
+COPY bashlib/ocrd-cis-lib.sh \
+	bashlib/ocrd-cis-docker-train.sh\
+	bashlib/ocrd-cis-post-correct.sh\
+	/apps/
+COPY data/docker/ocrd-cis-postcorrection.json\
+	data/docker/ocrd-cis-ocropy-frakur1.json\
+	data/docker/ocrd-cis-ocropy-frakur2.json\
+	${DATA}/config
 RUN sed -i -e "s/\${DATA}/${DATA}/g" ${DATA/config/*.json
 
 # install the profiler
