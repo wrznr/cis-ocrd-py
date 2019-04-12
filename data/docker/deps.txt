@@ -1,5 +1,6 @@
 cmake
-libxerces-c-dev
-libcppunit-dev
 jq
+libcppunit-dev
+libxerces-c-dev
 maven
+wget
