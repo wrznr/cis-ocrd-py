@@ -12,8 +12,8 @@ RUN apt-get update && \
 # copy cis-ocrd scripts and configuration
 COPY [
 	"bashlib/ocrd-cis-lib.sh",
-	"bashlib/ocrd-cis-docker-train.sh"
-	"bashlib/ocrd-cis-post-correct.sh"
+	"bashlib/ocrd-cis-docker-train.sh",
+	"bashlib/ocrd-cis-post-correct.sh",
 	"/apps/"]
 COPY [
 	"data/docker/ocrd-cis-postcorrection.json",
