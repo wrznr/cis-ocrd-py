@@ -18,7 +18,7 @@ COPY data/docker/ocrd-cis-post-correction.json\
 	data/docker/ocrd-cis-ocropy-fraktur1.json\
 	data/docker/ocrd-cis-ocropy-fraktur2.json\
 	${DATA}/config/
-RUN sed -i -e "s/\${DATA}/${DATA}/g" ${DATA/config/*.json
+RUN sed -i -e "s#\${DATA}#${DATA}#g" ${DATA}/config/*.json
 
 # install the profiler
 RUN	git clone ${GITURL}/Profiler --branch devel --single-branch /tmp/profiler &&\
