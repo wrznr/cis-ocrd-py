@@ -1,5 +1,4 @@
 FROM ocrd/core:latest
-VOLUME ["/data"]
 ENV VERSION="Di 2. Apr 17:50:22 CEST 2019"
 ENV GITURL="https://github.com/cisocrgroup"
 ENV DATA="/data/ocrd-cis-post-correction"
@@ -66,4 +65,5 @@ RUN mkdir ${DATA}/models &&\
 # TODOS:
 # - implement/adjust training script
 # - implement helper post-correction script
+VOLUME ["/data"]
 ENTRYPOINT ["/bin/sh", "-c"]
