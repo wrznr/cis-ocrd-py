@@ -55,7 +55,7 @@ RUN git clone ${GITURL}/ocrd-postcorrection --branch dev --single-branch /tmp/oc
 # download ocr models and pre-trainded post-correction model
 RUN cd /data &&\
 	wget cis.lmu.de/~finkf/model.zip &&\
-	wget cis.lmu.de/~finkf/fraktur1-00085000.pyrnn.gz
+	wget cis.lmu.de/~finkf/fraktur1-00085000.pyrnn.gz &&\
 	wget cis.lmu.de/~finkf/fraktur2-00062000.pyrnn.gz
 
 # TODOS:
