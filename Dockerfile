@@ -1,7 +1,7 @@
 FROM ocrd/core:latest
-ENV VERSION="Di 2. Apr 17:50:22 CEST 2019"
+ENV VERSION="Tue Apr 16 13:43:59 UTC 2019"
 ENV GITURL="https://github.com/cisocrgroup"
-ENV DATA="/data/ocrd-cis-post-correction"
+ENV DATA="/apps/ocrd-cis-post-correction"
 
 # deps
 COPY data/docker/deps.txt ${DATA}/deps.txt
@@ -43,7 +43,7 @@ RUN	git clone ${GITURL}/Resources --branch master --single-branch /tmp/resources
 RUN git clone ${GITURL}/cis-ocrd-py --branch dev --single-branch /tmp/cis-ocrd-py &&\
 	cd /tmp/cis-ocrd-py &&\
 	pip install --upgrade pip &&\
-	pip install --upgrade . &&\
+	pip install 'pillow<6.0.0' . &&\
 	cd / &&\
 	rm -rf /tmp/cis-ocrd-py
 
