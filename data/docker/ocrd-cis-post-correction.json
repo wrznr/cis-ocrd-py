@@ -6,7 +6,7 @@
 "profiler": {
 "type": "local",
 "executable": "/apps/profiler",
-"config": "${DATA}/languages",
+"config": "${DATA}/languages/german.ini",
 "cacheDir": "${DATA}/cache"
 },
 "ocr": [
