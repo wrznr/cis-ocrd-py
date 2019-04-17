@@ -1,6 +1,6 @@
 {
 "model": "${DATA}/models/model.zip",
-"jar": "/apps/ocrd-cis.jar",
+"jar": "${DATA}/ocrd-cis.jar",
 "ocr": [
 {
 "type": "ocropy",

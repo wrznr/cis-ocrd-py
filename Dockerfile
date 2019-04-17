@@ -51,7 +51,7 @@ RUN git clone ${GITURL}/cis-ocrd-py --branch dev --single-branch /tmp/cis-ocrd-p
 RUN git clone ${GITURL}/ocrd-postcorrection --branch dev --single-branch /tmp/ocrd-postcorrection &&\
 	cd /tmp/ocrd-postcorrection &&\
 	mvn -DskipTests package &&\
-	cp target/ocrd-0.1-cli.jar /apps/ocrd-cis.jar &&\
+	cp target/ocrd-0.1-cli.jar ${DATA}/ocrd-cis.jar &&\
 	cd / &&\
 	rm -rf /tmp/ocrd-postcorrection
 
