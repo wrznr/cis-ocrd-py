@@ -15,7 +15,7 @@ ocrd-cis-log-debug "log-level: $LOG_LEVEL"
 # run additional ocrs and align them
 ocrd-cis-run-ocr "$PARAMETER" "$METS" "$INPUT_FILE_GRP" "OCR-D-CIS-OCR-XXX"
 ocrd-cis-log-debug ocrd-cis-align \
-		--input-file-grp "$INPUT_FILE_GRP $OCRFILEGRPS" \
+		--input-file-grp "$INPUT_FILE_GRP,$OCRFILEGRPS" \
 		--output-file-grp "OCR-D-CIS-ALIGN"\
 		--mets "$METS" \
 		--parameter "$PARAMETER"\
