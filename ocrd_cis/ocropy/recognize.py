@@ -106,6 +106,21 @@ class OcropyRecognize(Processor):
         super(OcropyRecognize, self).__init__(*args, **kwargs)
         self.log = getLogger('OcropyRecognize')
 
+    def find_model(self):
+        """
+        Returns either self.parameter['model'] if this file exists or
+        ./models/self.parameter['model'] from the model directory.  Throws a
+        FileNotFoundError if the model cannot be found.
+        """
+        model1 = self.parameter['model']
+        if os.path.isfile(model1):
+            return model1
+        filepath = os.path.dirname(os.path.abspath(__file__))
+        model2 = os.path.join(filepath, "models", model1)
+        if not os.path.isfile(model2):
+            raise FileNotFoundError("cannot find model: {} or {}".format(model1, model2))
+        return model2
+
     def process(self):
         """
         Performs the (text) recognition.
@@ -116,17 +131,8 @@ class OcropyRecognize(Processor):
             raise Exception(
                 "currently only implemented at the line/glyph level")
 
-        #setting path to this python file and model folder
-        filepath = os.path.dirname(os.path.abspath(__file__))
-        modeldir = os.path.join(self.parameter['model_dir'],  self.parameter['model'])
-        if not (os.path.isfile(modeldir)) and not os.path.isfile(modeldir+'.gz'):
-            modeldir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models', self.parameter['model'])
-            if not os.path.isfile(modeldir) and not os.path.isfile(modeldir+'.gz'):
-                raise Exception("no model '{}' in model paths found".format(self.parameter['model']))
-
-
-        #loading model
-        network = ocrolib.load_object(modeldir, verbose=1)
+        # loading model
+        network = ocrolib.load_object(self.find_model(), verbose=1)
         for x in network.walk():
             x.postLoad()
         for x in network.walk():
