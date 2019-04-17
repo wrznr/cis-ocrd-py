@@ -123,7 +123,12 @@ ocrd-cis-run-ocr() {
 		local path=$(cat "$config" | jq --raw-output ".ocr[$i].path")
 		local utype=$(echo $type | tr '[:lower:]' '[:upper:]')
 		local xofg=${ofg/XXX/$utype-$((i+1))}
-		OCRFILEGRPS="$OCRFILEGRPS $xofg"
+		if [[ -z "$OCRFILEGRPS" ]]; then
+			OCRFILEGRPS="$xofg"
+		else
+			OCRFILEGRPS="$OCRFILEGRPS $xofg"
+		fi
+
 		if ocrd-cis-file-grp-exists "$mets" "$xofg"; then
 			ocrd-cis-log skipping ocr for $xofg
 			continue
