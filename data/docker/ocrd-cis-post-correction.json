@@ -1,6 +1,14 @@
 {
 "model": "${DATA}/models/model.zip",
 "jar": "${DATA}/ocrd-cis.jar",
+"nOCR": 2,
+"trigrams": "${DATA}/models/character-trigrams.csv",
+"profiler": {
+"type": "local",
+"executable": "/apps/profiler",
+"config": "${DATA}/languages",
+"cacheDir": "${DATA}/cache"
+},
 "ocr": [
 {
 "type": "ocropy",
