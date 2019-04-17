@@ -116,12 +116,17 @@ class OcropyRecognize(Processor):
             raise Exception(
                 "currently only implemented at the line/glyph level")
 
+        #setting path to this python file and model folder
         filepath = os.path.dirname(os.path.abspath(__file__))
+        modeldir = os.path.join(self.parameter['model_dir'],  self.parameter['model'])
+        if not (os.path.isfile(modeldir)) and not os.path.isfile(modeldir+'.gz'):
+            modeldir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'models', self.parameter['model'])
+            if not os.path.isfile(modeldir) and not os.path.isfile(modeldir+'.gz'):
+                raise Exception("no model '{}' in model paths found".format(self.parameter['model']))
 
-        ocropydir = os.path.dirname(os.path.abspath(__file__))
-        network = ocrolib.load_object(
-            os.path.join(ocropydir, 'models', self.parameter['model']),
-            verbose=1)
+
+        #loading model
+        network = ocrolib.load_object(modeldir, verbose=1)
         for x in network.walk():
             x.postLoad()
         for x in network.walk():

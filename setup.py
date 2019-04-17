@@ -10,6 +10,7 @@ Installs:
     - ocrd-cis-clean
     - ocrd-cis-cutter
     - ocrd-cis-importer
+    - ocrd-cis-linepredtoxml
 """
 
 from setuptools import setup
@@ -49,6 +50,8 @@ setup(
             'ocrd-cis-clean=ocrd_cis.div.cli:cis_ocrd_clean',
             'ocrd-cis-importer=ocrd_cis.div.cli:cis_ocrd_importer',
             'ocrd-cis-cutter=ocrd_cis.div.cli:cis_ocrd_cutter',
+            'ocrd-cis-linepredtoxml=ocrd_cis.div.cli:cis_ocrd_linepredtoxml',
+
         ]
     },
 )

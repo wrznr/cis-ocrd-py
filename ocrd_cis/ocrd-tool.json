@@ -222,6 +222,24 @@
 				}
 			}
 		},
+		"ocrd-cis-linepredtoxml": {
+			"executable": "ocrd-cis-linepredtoxml",
+			"categories": [
+				"Text recognition and optimization"
+			],
+			"steps": [
+				"postprocessing"
+			],
+			"description": "predictions to xml files",
+			"parameters": {
+				"predpath": {
+					"type": "string",
+					"description": "path to folder containing predictions and gt"
+				}
+			}
+		},
+
+
 		"ocrd-cis-clean": {
 			"executable": "ocrd-cis-clean",
 			"categories": [
