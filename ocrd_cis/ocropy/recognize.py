@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from ocrd_cis.ocropy.ocrolib import lstm
 from ocrd_cis.ocropy import ocrolib
 from ocrd_cis import get_ocrd_tool
+from ocrd_cis import find_image
 
 import sys
 import os.path
@@ -104,6 +105,7 @@ class OcropyRecognize(Processor):
         kwargs['ocrd_tool'] = self.ocrd_tool['tools']['ocrd-cis-ocropy-recognize']
         kwargs['version'] = self.ocrd_tool['version']
         super(OcropyRecognize, self).__init__(*args, **kwargs)
+        self.filepath = os.path.dirname(os.path.abspath(__file__))
         self.log = getLogger('OcropyRecognize')
 
     def find_model(self):
@@ -115,8 +117,7 @@ class OcropyRecognize(Processor):
         model1 = self.parameter['model']
         if os.path.isfile(model1):
             return model1
-        filepath = os.path.dirname(os.path.abspath(__file__))
-        model2 = os.path.join(filepath, "models", model1)
+        model2 = os.path.join(self.filepath, "models", model1)
         if not os.path.isfile(model2):
             raise FileNotFoundError("cannot find model: {} or {}".format(model1, model2))
         return model2
@@ -146,9 +147,16 @@ class OcropyRecognize(Processor):
         for (n, input_file) in enumerate(self.input_files):
             # self.log.info("INPUT FILE %i / %s", n, input_file)
             pcgts = page_from_file(self.workspace.download_file(input_file))
-            pil_image = self.workspace.resolve_image_as_pil(
-                pcgts.get_Page().imageFilename)
+            imgfile = find_image(self.workspace.mets, input_file)
+            if imgfile is None:
+                raise Exception("cannot find image for {}".format(input_file.ID))
+            print("imgfile =", imgfile)
+            pil_image = self.workspace.resolve_image_as_pil(imgfile.url)
+            # pil_image = self.workspace.resolve_image_as_pil(
+            #     pcgts.get_Page().imageFilename)
 
+            self.log.info("page = %s", pcgts)
+            self.log.info("page = %s", pcgts.get_Page())
             self.log.info("Recognizing text in page '%s'", pcgts.get_pcGtsId())
             page = pcgts.get_Page()
 
@@ -157,8 +165,7 @@ class OcropyRecognize(Processor):
             if not regions:
                 self.log.warning("Page contains no text regions")
 
-            args = [lnorm, network, pil_image, filepath, pad]
-
+            args = [lnorm, network, pil_image, self.filepath, pad]
             self.process_regions(regions, maxlevel, args)
 
             # Use the input file's basename for the new file
