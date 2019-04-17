@@ -8,6 +8,16 @@ ocrd-cis-log() {
 	echo $(date +%R:%S.%N | sed -e 's/.*\([0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9]\).*/\1/') $LOG_LEVEL $* >&2
 }
 
+ocrd-cis-log-debug() {
+	if [[ $LOG_LEVEL == "DEBUG" ]]; then
+		ocrd-cis-log $*
+	fi
+}
+
+ocrd-cis-log-info() {
+	ocrd-cis-log $*
+}
+
 # utility function to join strings with a given string
 function ocrd-cis-join-by { local IFS="$1"; shift; echo "$*"; }
 
