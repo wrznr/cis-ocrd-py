@@ -9,17 +9,6 @@ COPY data/docker/deps.txt ${DATA}/deps.txt
 RUN apt-get update && \
 	apt-get -y install --no-install-recommends $(cat ${DATA}/deps.txt)
 
-# copy cis-ocrd scripts and configuration
-COPY bashlib/ocrd-cis-lib.sh \
-	bashlib/ocrd-cis-docker-train.sh\
-	bashlib/ocrd-cis-post-correct.sh\
-	/apps/
-COPY data/docker/ocrd-cis-post-correction.json\
-	data/docker/ocrd-cis-ocropy-fraktur1.json\
-	data/docker/ocrd-cis-ocropy-fraktur2.json\
-	${DATA}/config/
-RUN sed -i -e "s#\${DATA}#${DATA}#g" ${DATA}/config/*.json
-
 # install the profiler
 RUN	git clone ${GITURL}/Profiler --branch devel --single-branch /tmp/profiler &&\
 	cd /tmp/profiler &&\
@@ -63,6 +52,18 @@ RUN mkdir ${DATA}/models &&\
 	wget ${DOWNLOAD_URL}/fraktur1-00085000.pyrnn.gz &&\
 	wget ${DOWNLOAD_URL}/fraktur2-00062000.pyrnn.gz &&\
 	wget ${DOWNLOAD_URL}/character-trigrams.csv
+
+# copy cis-ocrd scripts and configuration
+COPY bashlib/ocrd-cis-lib.sh \
+	bashlib/ocrd-cis-docker-train.sh\
+	bashlib/ocrd-cis-post-correct.sh\
+	/apps/
+COPY data/docker/ocrd-cis-post-correction.json\
+	data/docker/ocrd-cis-ocropy-fraktur1.json\
+	data/docker/ocrd-cis-ocropy-fraktur2.json\
+	${DATA}/config/
+RUN sed -i -e "s#\${DATA}#${DATA}#g" ${DATA}/config/*.json
+
 
 # TODOS:
 # - implement/adjust training script
