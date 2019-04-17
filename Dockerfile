@@ -34,16 +34,16 @@ RUN	git clone ${GITURL}/Resources --branch master --single-branch /tmp/resources
 	cd / &&\
 	rm -rf /tmp/resources
 
-# install cis-ocrd-py
-RUN git clone ${GITURL}/cis-ocrd-py --branch dev --single-branch /tmp/cis-ocrd-py &&\
+# install cis-ocrd-py (python)
+RUN git clone ${GITURL}/cis-ocrd-py --branch dockerfile --single-branch /tmp/cis-ocrd-py &&\
 	cd /tmp/cis-ocrd-py &&\
 	pip install --upgrade pip &&\
 	pip install 'pillow<6.0.0' . &&\
 	cd / &&\
 	rm -rf /tmp/cis-ocrd-py
 
-# install cis-ocrd-py
-RUN git clone ${GITURL}/ocrd-postcorrection --branch dockerfile --single-branch /tmp/ocrd-postcorrection &&\
+# install ocr-postcorrection (java)
+RUN git clone ${GITURL}/ocrd-postcorrection --branch dev --single-branch /tmp/ocrd-postcorrection &&\
 	cd /tmp/ocrd-postcorrection &&\
 	mvn -DskipTests package &&\
 	cp target/ocrd-0.1-cli.jar ${DATA}/ocrd-cis.jar &&\
