@@ -9,6 +9,11 @@ COPY data/docker/deps.txt ${DATA}/deps.txt
 RUN apt-get update && \
 	apt-get -y install --no-install-recommends $(cat ${DATA}/deps.txt)
 
+# locales
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale LANG=en_US.UTF-8
+
 # install the profiler
 RUN	git clone ${GITURL}/Profiler --branch devel --single-branch /tmp/profiler &&\
 	cd /tmp/profiler &&\

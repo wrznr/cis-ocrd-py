@@ -2,5 +2,6 @@ cmake
 jq
 libcppunit-dev
 libxerces-c-dev
+locales
 maven
 wget
