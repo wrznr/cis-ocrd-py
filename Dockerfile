@@ -1,6 +1,7 @@
 FROM ocrd/core:latest
 ENV VERSION="Tue Apr 16 13:43:59 UTC 2019"
 ENV GITURL="https://github.com/cisocrgroup"
+ENV DOWNLOAD_URL="http://cis.lmu.de/~finkf"
 ENV DATA="/apps/ocrd-cis-post-correction"
 
 # deps
@@ -58,12 +59,12 @@ RUN git clone ${GITURL}/ocrd-postcorrection --branch dev --single-branch /tmp/oc
 # download ocr models and pre-trainded post-correction model
 RUN mkdir ${DATA}/models &&\
 	cd ${DATA}/models &&\
-	wget cis.lmu.de/~finkf/model.zip &&\
-	wget cis.lmu.de/~finkf/fraktur1-00085000.pyrnn.gz &&\
-	wget cis.lmu.de/~finkf/fraktur2-00062000.pyrnn.gz
+	wget ${DOWNLOAD_URL}/model.zip &&\
+	wget ${DOWNLOAD_URL}/fraktur1-00085000.pyrnn.gz &&\
+	wget ${DOWNLOAD_URL}/fraktur2-00062000.pyrnn.gz &&\
+	wget ${DOWNLOAD_URL}/character-trigrams.csv
 
 # TODOS:
 # - implement/adjust training script
-# - implement helper post-correction script
 VOLUME ["/data"]
 ENTRYPOINT ["/bin/sh", "-c"]
