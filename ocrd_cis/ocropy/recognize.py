@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from ocrd_cis.ocropy.ocrolib import lstm
+from ocrd_cis.ocropy.ocrolib import pil2array
 from ocrd_cis.ocropy import ocrolib
 from ocrd_cis import get_ocrd_tool
 from ocrd_cis import find_image
@@ -57,12 +58,33 @@ def deletefile(file):
     if os.path.exists(file):
         os.remove(file)
 
+def image_to_array(img):
+    a = pil2array(img)
+    if a.dtype==dtype('uint8'):
+        a = a/255.0
+    if a.dtype==dtype('int8'):
+        a = a/127.0
+    elif a.dtype==dtype('uint16'):
+        a = a/65536.0
+    elif a.dtype==dtype('int16'):
+        a = a/32767.0
+    elif isfloatarray(a):
+        pass
+    else:
+        raise OcropusException("unknown image type: "+a.dtype)
+    if a.ndim==3:
+        a = mean(a,2)
+    return a
 
 def process1(fname, pad, lnorm, network):
     base, _ = ocrolib.allsplitext(fname)
     line = ocrolib.read_image_gray(fname)
     deletefile(fname)
+    return process_img_gray(line, pad, lnorm, network)
 
+
+def process_img_gray(img_gray, pad, lnorm, network):
+    line = img_gray #image_to_array(img_gray)
     raw_line = line.copy()
     if np.prod(line.shape) == 0:
         return None
@@ -197,7 +219,7 @@ class OcropyRecognize(Processor):
 
     def process_lines(self, textlines, maxlevel, args):
         lnorm, network, pil_image, filepath, pad = args
-
+        self.log.debug("pil_image: %s", pil_image)
         for line in textlines:
             self.log.info("Recognizing text in line '%s'", line.id)
 
@@ -223,12 +245,15 @@ class OcropyRecognize(Processor):
             # print("w = {}, h = {}".format(w, h))
             # final_img.save('/tmp/foo.png')
             # save temp image
-            imgpath = os.path.join(filepath, 'temp/temp_' + str(os.getpid()) + '.png')
+            imgpath = '/tmp/ocrd-cis-ocropus-recognize-' + str(os.getpid()) + '.png'
+            self.log.debug("saving tmp image to %s", imgpath)
             final_img.save(imgpath)
 
-            # process ocropy; temp file is deleted in process1
+            # # process ocropy; temp file is deleted in process1
             linepred, clist, rlist, confidlist = process1(
                 imgpath, pad, lnorm, network)
+            # linepred, clist, rlist, confidlist = process_img_gray(
+            #     final_img, pad, lnorm, network)
             self.log.debug("gt   '%s': '%s'", line.id, line.TextEquiv[0].Unicode)
             self.log.debug("line '%s': '%s'", line.id, linepred)
             words = [x.strip() for x in linepred.split(' ') if x.strip()]
