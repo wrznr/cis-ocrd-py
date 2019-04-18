@@ -58,24 +58,6 @@ def deletefile(file):
     if os.path.exists(file):
         os.remove(file)
 
-def image_to_array(img):
-    a = pil2array(img)
-    if a.dtype==dtype('uint8'):
-        a = a/255.0
-    if a.dtype==dtype('int8'):
-        a = a/127.0
-    elif a.dtype==dtype('uint16'):
-        a = a/65536.0
-    elif a.dtype==dtype('int16'):
-        a = a/32767.0
-    elif isfloatarray(a):
-        pass
-    else:
-        raise OcropusException("unknown image type: "+a.dtype)
-    if a.ndim==3:
-        a = mean(a,2)
-    return a
-
 def process1(fname, pad, lnorm, network):
     base, _ = ocrolib.allsplitext(fname)
     line = ocrolib.read_image_gray(fname)
@@ -174,8 +156,6 @@ class OcropyRecognize(Processor):
                 raise Exception("cannot find image for {}".format(input_file.ID))
             print("imgfile =", imgfile)
             pil_image = self.workspace.resolve_image_as_pil(imgfile.url)
-            # pil_image = self.workspace.resolve_image_as_pil(
-            #     pcgts.get_Page().imageFilename)
 
             self.log.info("page = %s", pcgts)
             self.log.info("page = %s", pcgts.get_Page())
