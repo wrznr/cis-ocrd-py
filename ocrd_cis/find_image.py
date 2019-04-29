@@ -15,15 +15,12 @@ def find_image_url(workspace, pcgts, input_file, prefixes=['OCR-D-IMG-BIN', 'OCR
         return path
 
     xpath = './/mets:fptr[@FILEID="%s"]' % input_file.ID
-    # print("xpath =", str(xpath))
     fptr = workspace.mets._tree.getroot().find(xpath, NS)
-    # print("fptr =", fptr)
     if fptr is None:
         return None
 
     for fptr in list(fptr.getparent()):#.getchildren():
         file_id = fptr.attrib['FILEID']
-        #print("file_id =", file_id)
         for prefix in prefixes:
             if not file_id.startswith(prefix):
                 continue
