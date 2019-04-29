@@ -4,7 +4,7 @@ from ocrd_cis.ocropy.ocrolib import lstm
 from ocrd_cis.ocropy.ocrolib import pil2array
 from ocrd_cis.ocropy import ocrolib
 from ocrd_cis import get_ocrd_tool
-from ocrd_cis import find_image
+from ocrd_cis import find_image_url
 
 import sys
 import os.path
@@ -151,11 +151,11 @@ class OcropyRecognize(Processor):
         for (n, input_file) in enumerate(self.input_files):
             # self.log.info("INPUT FILE %i / %s", n, input_file)
             pcgts = page_from_file(self.workspace.download_file(input_file))
-            imgfile = find_image(self.workspace.mets, input_file)
+            imgfile = find_image_url(self.workspace, pcgts, input_file)
             if imgfile is None:
                 raise Exception("cannot find image for {}".format(input_file.ID))
-            print("imgfile =", imgfile)
-            pil_image = self.workspace.resolve_image_as_pil(imgfile.url)
+            self.log.debug("imgfile = %s", imgfile)
+            pil_image = self.workspace.resolve_image_as_pil(imgfile)
 
             self.log.info("page = %s", pcgts)
             self.log.info("page = %s", pcgts.get_Page())
