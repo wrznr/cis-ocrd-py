@@ -1,5 +1,5 @@
 FROM ocrd/core:latest
-ENV VERSION="Thu Apr 18 10:38:26 CEST 2019"
+ENV VERSION="Wed 12 Jun 2019 02:59:19 PM CEST"
 ENV GITURL="https://github.com/cisocrgroup"
 ENV DOWNLOAD_URL="http://cis.lmu.de/~finkf"
 ENV DATA="/apps/ocrd-cis-post-correction"
@@ -35,20 +35,20 @@ RUN	git clone ${GITURL}/Resources --branch master --single-branch /tmp/resources
 	rm -rf /tmp/resources
 
 # install cis-ocrd-py (python)
-RUN git clone ${GITURL}/cis-ocrd-py --branch dockerfile --single-branch /tmp/cis-ocrd-py &&\
-	cd /tmp/cis-ocrd-py &&\
-	pip install --upgrade pip &&\
-	pip install 'pillow<6.0.0' . &&\
-	cd / &&\
-	rm -rf /tmp/cis-ocrd-py
+RUN git clone ${GITURL}/cis-ocrd-py --branch dockerfile --single-branch /tmp/cis-ocrd-py \
+	&& cd /tmp/cis-ocrd-py \
+	&& pip install --upgrade pip \
+	&& pip install 'pillow<6.0.0' . \
+	&& cd / \
+	&& rm -rf /tmp/cis-ocrd-py
 
 # install ocr-postcorrection (java)
-RUN git clone ${GITURL}/ocrd-postcorrection --branch dev --single-branch /tmp/ocrd-postcorrection &&\
-	cd /tmp/ocrd-postcorrection &&\
-	mvn -DskipTests package &&\
-	cp target/ocrd-0.1-cli.jar ${DATA}/ocrd-cis.jar &&\
-	cd / &&\
-	rm -rf /tmp/ocrd-postcorrection
+RUN git clone ${GITURL}/ocrd-postcorrection --branch dev --single-branch /tmp/ocrd-postcorrection \
+	&& cd /tmp/ocrd-postcorrection \
+	&& mvn -DskipTests package \
+	&& cp target/ocrd-0.1-cli.jar ${DATA}/ocrd-cis.jar \
+	&& cd / \
+	&& rm -rf /tmp/ocrd-postcorrection
 
 # download ocr models and pre-trainded post-correction model
 RUN mkdir ${DATA}/models &&\
