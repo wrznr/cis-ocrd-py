@@ -1,5 +1,5 @@
 FROM ocrd/core:latest
-ENV VERSION="Wed 12 Jun 2019 02:59:19 PM CEST"
+ENV VERSION="Wed 12 Jun 2019 02:59:37 PM CEST"
 ENV GITURL="https://github.com/cisocrgroup"
 ENV DOWNLOAD_URL="http://cis.lmu.de/~finkf"
 ENV DATA="/apps/ocrd-cis-post-correction"
