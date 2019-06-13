@@ -290,6 +290,7 @@ class OcropyRecognize(Processor):
         if maxlevel not in ['line', 'word', 'glyph']:
             raise Exception(
                 "currently only implemented at the line/glyph level")
+        filepath = os.path.dirname(os.path.abspath(__file__))
 
         # loading model
         network = ocrolib.load_object(self.find_model(), verbose=1)
