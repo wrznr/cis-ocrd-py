@@ -106,7 +106,7 @@ class OcropyDeskew(Processor):
     
     def _process_segment(self, segment, segment_image, segment_xywh, segment_id, page_id, file_id):
         LOG.info("About to deskew %s", segment_id)
-        if segment.get_orientation()):
+        if segment.get_orientation():
             LOG.error('%s already has non-zero orientation: %.1f',
                       segment_id, segment.get_orientation())
             # it would be dangerous to proceed here, because
