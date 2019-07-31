@@ -161,7 +161,7 @@ class OcropyBinarize(Processor):
         # annotate angle in PAGE (to allow consumers of the AlternativeImage
         # to do consistent coordinate transforms, and non-consumers
         # to redo the rotation themselves):
-        #page.set_orientation(-angle) # FIXME does not exist on page level yet!
+        page.set_orientation(-angle)
         # update METS (add the image file):
         file_path = save_image_file(
             self.workspace,
