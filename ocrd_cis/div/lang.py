@@ -1,8 +1,8 @@
 from __future__ import absolute_import
-from ocrd_utils import getLogger, concat_padded, xywh_from_points, points_from_x0y0x1y1
-from ocrd import Processor, MIMETYPE_PAGE
+from ocrd_utils import getLogger
+from ocrd import Processor
 from ocrd_cis import get_ocrd_tool
-from ocrd.model.ocrd_page_generateds import parse, parsexml_, parsexmlstring_
+from ocrd.model.ocrd_page_generateds import parse
 from collections import defaultdict
 
 
@@ -42,45 +42,45 @@ class Lang(Processor):
                     try:
                         llang = line.primaryLanguage
                         linelang[llang] += 1
-                    except:
+                    except TypeError:
                         pass
 
                     try:
                         lfont = line.fontFamily
-                        linefont[lfont] +=1
-                    except:
+                        linefont[lfont] += 1
+                    except TypeError:
                         pass
 
                     words = line.get_Word()
                     for word in words:
                         try:
                             wlang = word.language
-                            wordlang[wlang] +=1
-                        except:
+                            wordlang[wlang] += 1
+                        except TypeError:
                             pass
 
                         try:
                             wfont = word.get_TextStyle().fontFamily
                             wordfont[wfont] += 1
-                        except:
+                        except TypeError:
                             pass
 
         #predominant language
         try:
             lang = max(linelang, key=lambda k: linelang[k])
-        except:
+        except TypeError:
             try:
                 lang = max(wordlang, key=lambda k: wordlang[k])
-            except:
+            except TypeError:
                 lang = 'German'
 
         #predominant font
         try:
             font = max(linefont, key=lambda k: linefont[k])
-        except:
+        except TypeError:
             try:
                 font = max(wordfont, key=lambda k: wordfont[k])
-            except:
+            except TypeError:
                 font = 'Antiqua'
 
 

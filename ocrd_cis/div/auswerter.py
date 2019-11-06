@@ -1,14 +1,12 @@
 
-import json
 import subprocess
 import os
 import re
-import sys
 from PIL import Image
 
 
 def cmd_to_string(cmd):
-    """remove unneded whitepsace from command strings"""
+    """remove unneeded whitespace from command strings"""
     return re.sub("""\\s+""", " ", cmd).strip()
 
 
