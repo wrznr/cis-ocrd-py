@@ -29,28 +29,27 @@ from .common import (
     #borderclean_bin
 )
 
-#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 TOOL = 'ocrd-cis-ocropy-resegment'
 LOG = getLogger('processor.OcropyResegment')
-FILEGRP_IMG = 'OCR-D-IMG-RESEG'
+FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-RESEG'
 
 def resegment(line_polygon, region_labels, region_bin, line_id,
               extend_margins=3,
               threshold_relative=0.8, threshold_absolute=50):
     """Reduce line polygon in a labelled region to the largest intersection.
     
-    Given a Numpy array `line_polygon` of relative coordinates
-    in a region given by a Numpy array `region_labels` of numbered
-    segments and a Numpy array `region_bin` of foreground pixels,
+    Given a Numpy array ``line_polygon`` of relative coordinates
+    in a region given by a Numpy array ``region_labels`` of numbered
+    segments and a Numpy array ``region_bin`` of foreground pixels,
     find the label of the largest segment that intersects the polygon.
     If the number of foreground pixels within that segment is larger
-    than `threshold_absolute` and if the share of foreground pixels
-    within the whole polygon is larger than `threshold_relative`,
+    than ``threshold_absolute`` and if the share of foreground pixels
+    within the whole polygon is larger than ``threshold_relative``,
     then compute the contour of that intersection and return it
     as a new polygon. Otherwise, return None.
     
-    If `extend_margins` is larger than zero, then extend `line_polygon`
+    If ``extend_margins`` is larger than zero, then extend ``line_polygon``
     by that amount of pixels horizontally and vertically before.
     """
     height, width = region_labels.shape
@@ -110,6 +109,13 @@ class OcropyResegment(Processor):
         kwargs['ocrd_tool'] = self.ocrd_tool['tools'][TOOL]
         kwargs['version'] = self.ocrd_tool['version']
         super(OcropyResegment, self).__init__(*args, **kwargs)
+        if hasattr(self, 'output_file_grp'):
+            try:
+                self.page_grp, self.image_grp = self.output_file_grp.split(',')
+            except ValueError:
+                self.page_grp = self.output_file_grp
+                self.image_grp = FALLBACK_FILEGRP_IMG
+                LOG.info("No output file group for images specified, falling back to '%s'", FALLBACK_FILEGRP_IMG)
 
     def process(self):
         """Resegment lines of the workspace.
@@ -129,6 +135,10 @@ class OcropyResegment(Processor):
         outline, intersect with the old polygon, and find the contour of that
         segment. Annotate the result as new coordinates of the line.
         
+        Add a new image file to the workspace with the fileGrp USE given
+        in the second position of the output fileGrp, or ``OCR-D-IMG-RESEG``,
+        and an ID based on input file and input element.
+        
         Produce a new output file by serialising the resulting hierarchy.
         """
         # This makes best sense for bad/coarse segmentation, like current GT.
@@ -143,9 +153,9 @@ class OcropyResegment(Processor):
         
         for (n, input_file) in enumerate(self.input_files):
             LOG.info("INPUT FILE %i / %s", n, input_file.pageId or input_file.ID)
-            file_id = input_file.ID.replace(self.input_file_grp, FILEGRP_IMG)
+            file_id = input_file.ID.replace(self.input_file_grp, self.image_grp)
             if file_id == input_file.ID:
-                file_id = concat_padded(FILEGRP_IMG, n)
+                file_id = concat_padded(self.image_grp, n)
             
             pcgts = page_from_file(self.workspace.download_file(input_file))
             page_id = pcgts.pcGtsId or input_file.pageId or input_file.ID # (PageType has no id)
@@ -168,6 +178,9 @@ class OcropyResegment(Processor):
                 lines = region.get_TextLine()
                 if not lines:
                     LOG.warning('Page "%s" region "%s" contains no text lines', page_id, region.id)
+                    continue
+                if len(lines) == 1:
+                    LOG.warning('Page "%s" region "%s" contains only one line', page_id, region.id)
                     continue
                 region_image, region_xywh = self.workspace.image_from_segment(
                     region, page_image, page_xywh)
@@ -195,13 +208,11 @@ class OcropyResegment(Processor):
                 for line in lines:
                     alternative_image = line.get_AlternativeImage()
                     if alternative_image:
-                        LOG.debug("Using AlternativeImage %d (%s) for line '%s'",
-                                  len(alternative_image), alternative_image[-1].get_comments(),
-                                  line.id)
-                        line_image = self.workspace.resolve_image_as_pil(
-                            alternative_image[-1].get_filename())
-                        # crop region_labels accordingly:
-                        line_xywh = xywh_from_points(line.get_Coords().points)
+                        line_image, line_xywh = self.workspace.image_from_segment(
+                            line, region_image, region_xywh)
+                        LOG.debug("Using AlternativeImage (%s) for line '%s'",
+                                  line_xywh['features'], line.id)
+                        # crop region arrays accordingly:
                         line_labels = region_labels[line_xywh['y']-region_xywh['y']:
                                                     line_xywh['y']-region_xywh['y']+line_xywh['h'],
                                                     line_xywh['x']-region_xywh['x']:
@@ -237,26 +248,24 @@ class OcropyResegment(Processor):
                         line_image,
                         file_id=file_id + '_' + region.id + '_' + line.id,
                         page_id=page_id,
-                        file_grp=FILEGRP_IMG)
+                        file_grp=self.image_grp)
                     # update PAGE (reference the image file):
                     line.add_AlternativeImage(AlternativeImageType(
                         filename=file_path,
-                        comments=('cropped,clipped')))
+                        comments=region_xywh['features']))
             
             # update METS (add the PAGE file):
-            file_id = input_file.ID.replace(self.input_file_grp,
-                                            self.output_file_grp)
+            file_id = input_file.ID.replace(self.input_file_grp, self.page_grp)
             if file_id == input_file.ID:
-                file_id = concat_padded(self.output_file_grp, n)
-            file_path = os.path.join(self.output_file_grp,
-                                     file_id + '.xml')
+                file_id = concat_padded(self.page_grp, n)
+            file_path = os.path.join(self.page_grp, file_id + '.xml')
             out = self.workspace.add_file(
                 ID=file_id,
-                file_grp=self.output_file_grp,
+                file_grp=self.page_grp,
                 pageId=input_file.pageId,
                 local_filename=file_path,
                 mimetype=MIMETYPE_PAGE,
                 content=to_xml(pcgts))
             LOG.info('created file ID: %s, file_grp: %s, path: %s',
-                     file_id, self.output_file_grp, out.local_filename)
+                     file_id, self.page_grp, out.local_filename)
     

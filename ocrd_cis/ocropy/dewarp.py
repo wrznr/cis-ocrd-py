@@ -19,27 +19,50 @@ from .common import (
 #sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 LOG = getLogger('processor.OcropyDewarp')
-FILEGRP_IMG = 'OCR-D-IMG-DEWARP'
+FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-DEWARP'
+
+class InvalidLine(Exception):
+    """Line image does not allow dewarping and should be ignored."""
+    pass
+
+class InadequateLine(Exception):
+    """Line image is not safe for dewarping and should be padded instead."""
+    pass
 
 # from ocropus-dewarp, but without resizing
 def dewarp(image, lnorm, check=True):
     line = pil2array(image)
     
     if np.prod(line.shape) == 0:
-        raise Exception('image dimensions are zero')
+        raise InvalidLine('image dimensions are zero')
     if np.amax(line) == np.amin(line):
-        raise Exception('image is blank')
+        raise InvalidLine('image is blank')
     
     temp = np.amax(line)-line # inverse, zero-closed
     if check:
         report = check_line(temp)
         if report:
-            raise Exception(report)
+            raise InadequateLine(report)
+        # if the line was cropped badly (with intruders from
+        # neighbouring lines immediately at the top or bottom,
+        # dewarping the intruders would warp our actual line):
+        if np.sum(temp[0]) / temp.shape[-1] > 0.2:
+            raise InvalidLine("top is not padded, assuming bad cropping")
+        if np.sum(temp[-1]) / temp.shape[-1] > 0.2:
+            raise InvalidLine("bottom is not padded, assuming bad cropping")
     
     temp = temp * 1.0 / np.amax(temp) # normalized
     lnorm.measure(temp) # find centerline
     line = lnorm.dewarp(line, cval=np.amax(line))
     
+    return array2pil(line)
+
+# pad with white above and below (as a fallback for dewarp)
+def padvert(image, range_):
+    line = pil2array(image)
+    height = line.shape[0]
+    margin = int(range_ * height / 16)
+    line = np.pad(line, ((margin, margin), (0, 0)), constant_values=1.0)
     return array2pil(line)
 
 class OcropyDewarp(Processor):
@@ -49,10 +72,16 @@ class OcropyDewarp(Processor):
         kwargs['ocrd_tool'] = self.ocrd_tool['tools']['ocrd-cis-ocropy-dewarp']
         kwargs['version'] = self.ocrd_tool['version']
         super(OcropyDewarp, self).__init__(*args, **kwargs)
-
-        # defaults from ocrolib.lineest:
-        range_ = self.parameter['range']
-        self.lnorm = lineest.CenterNormalizer(params=(range_, 1.0, 0.3))
+        if hasattr(self, 'output_file_grp'):
+            # defaults from ocrolib.lineest:
+            range_ = self.parameter['range']
+            self.lnorm = lineest.CenterNormalizer(params=(range_, 1.0, 0.3))
+            try:
+                self.page_grp, self.image_grp = self.output_file_grp.split(',')
+            except ValueError:
+                self.page_grp = self.output_file_grp
+                self.image_grp = FALLBACK_FILEGRP_IMG
+                LOG.info("No output file group for images specified, falling back to '%s'", FALLBACK_FILEGRP_IMG)
 
     def process(self):
         """Dewarp the lines of the workspace.
@@ -65,8 +94,9 @@ class OcropyDewarp(Processor):
         into the higher-level image), and dewarp it (without resizing).
         Export the result as an image file.
         
-        Add the new image file to the workspace with a fileGrp USE equal
-        `OCR-D-IMG-DEWARP` and an ID based on input file and input element.
+        Add the new image file to the workspace with a fileGrp USE given
+        in the second position of the output fileGrp, or ``OCR-D-IMG-DEWARP``,
+        and an ID based on input file and input element.
         
         Reference each new image in the AlternativeImage of the element.
         
@@ -75,9 +105,9 @@ class OcropyDewarp(Processor):
         
         for (n, input_file) in enumerate(self.input_files):
             LOG.info("INPUT FILE %i / %s", n, input_file.pageId or input_file.ID)
-            file_id = input_file.ID.replace(self.input_file_grp, FILEGRP_IMG)
+            file_id = input_file.ID.replace(self.input_file_grp, self.image_grp)
             if file_id == input_file.ID:
-                file_id = concat_padded(FILEGRP_IMG, n)
+                file_id = concat_padded(self.image_grp, n)
             
             pcgts = page_from_file(self.workspace.download_file(input_file))
             page_id = pcgts.pcGtsId or input_file.pageId or input_file.ID # (PageType has no id)
@@ -104,43 +134,46 @@ class OcropyDewarp(Processor):
                 if not lines:
                     LOG.warning('Region %s contains no text lines', region.id)
                 for line in lines:
-                    line_image, _ = self.workspace.image_from_segment(
+                    line_image, line_xywh = self.workspace.image_from_segment(
                         line, region_image, region_xywh)
                     
                     LOG.info("About to dewarp page '%s' region '%s' line '%s'",
                              page_id, region.id, line.id)
                     try:
                         dew_image = dewarp(line_image, self.lnorm, check=True)
-                    except Exception as err:
-                        LOG.error('error dewarping line "%s": %s', line.id, err)
+                    except InvalidLine as err:
+                        LOG.error('cannot dewarp line "%s": %s', line.id, err)
                         continue
+                    except InadequateLine as err:
+                        LOG.warning('cannot dewarp line "%s": %s', line.id, err)
+                        # as a fallback, simply pad the image vertically
+                        # (just as dewarping would do on average, so at least
+                        #  this line has similar margins as the others):
+                        dew_image = padvert(line_image, self.parameter['range'])
                     # update METS (add the image file):
                     file_path = self.workspace.save_image_file(
                         dew_image,
                         file_id + '_' + region.id + '_' + line.id,
                         page_id=input_file.pageId,
-                        file_grp=FILEGRP_IMG)
+                        file_grp=self.image_grp)
                     # update PAGE (reference the image file):
                     alternative_image = line.get_AlternativeImage()
                     line.add_AlternativeImage(AlternativeImageType(
                         filename=file_path,
-                        comments=(alternative_image[-1].get_comments() + ','
-                                  if alternative_image else '') + 'dewarped'))
+                        comments=line_xywh['features'] + ',dewarped'))
             
             # update METS (add the PAGE file):
-            file_id = input_file.ID.replace(self.input_file_grp,
-                                            self.output_file_grp)
+            file_id = input_file.ID.replace(self.input_file_grp, self.page_grp)
             if file_id == input_file.ID:
-                file_id = concat_padded(self.output_file_grp, n)
-            file_path = os.path.join(self.output_file_grp,
-                                     file_id + '.xml')
+                file_id = concat_padded(self.page_grp, n)
+            file_path = os.path.join(self.page_grp, file_id + '.xml')
             out = self.workspace.add_file(
                 ID=file_id,
-                file_grp=self.output_file_grp,
+                file_grp=self.page_grp,
                 pageId=input_file.pageId,
                 local_filename=file_path,
                 mimetype=MIMETYPE_PAGE,
                 content=to_xml(pcgts))
             LOG.info('created file ID: %s, file_grp: %s, path: %s',
-                     file_id, self.output_file_grp, out.local_filename)
+                     file_id, self.page_grp, out.local_filename)
     

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import os.path
 import numpy as np
-from PIL import Image, ImageStat
+from PIL import Image, ImageStat, ImageOps
 from scipy.ndimage import filters
 
 from ocrd_modelfactory import page_from_file
@@ -31,11 +31,9 @@ from .common import (
     pil2array, array2pil
 )
 
-#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 TOOL = 'ocrd-cis-ocropy-clip'
 LOG = getLogger('processor.OcropyClip')
-FILEGRP_IMG = 'OCR-D-IMG-CLIP'
+FALLBACK_FILEGRP_IMG = 'OCR-D-IMG-CLIP'
 
 class OcropyClip(Processor):
 
@@ -44,13 +42,20 @@ class OcropyClip(Processor):
         kwargs['ocrd_tool'] = self.ocrd_tool['tools'][TOOL]
         kwargs['version'] = self.ocrd_tool['version']
         super(OcropyClip, self).__init__(*args, **kwargs)
+        if hasattr(self, 'output_file_grp'):
+            try:
+                self.page_grp, self.image_grp = self.output_file_grp.split(',')
+            except ValueError:
+                self.page_grp = self.output_file_grp
+                self.image_grp = FALLBACK_FILEGRP_IMG
+                LOG.info("No output file group for images specified, falling back to '%s'", FALLBACK_FILEGRP_IMG)
 
     def process(self):
         """Clip text regions / lines of the workspace at intersections with neighbours.
         
         Open and deserialise PAGE input files and their respective images,
         then iterate over the element hierarchy down to the requested
-        `level-of-operation`.
+        ``level-of-operation``.
         
         Next, get each segment image according to the layout annotation (by cropping
         via coordinates into the higher-level image), as well as all its neighbours',
@@ -62,8 +67,9 @@ class OcropyClip(Processor):
         which are only contained in the neighbour by clipping them to white (background),
         and export the (final) result as image file.
         
-        Add the new image file to the workspace with a fileGrp USE equal
-        `OCR-D-IMG-CLIP` and an ID based on the input file and input element.
+        Add the new image file to the workspace with the fileGrp USE given
+        in the second position of the output fileGrp, or ``OCR-D-IMG-CLIP``,
+        and an ID based on the input file and input element.
         
         Reference each new image in the AlternativeImage of the element.
         
@@ -83,9 +89,9 @@ class OcropyClip(Processor):
         
         for (n, input_file) in enumerate(self.input_files):
             LOG.info("INPUT FILE %i / %s", n, input_file.pageId or input_file.ID)
-            file_id = input_file.ID.replace(self.input_file_grp, FILEGRP_IMG)
+            file_id = input_file.ID.replace(self.input_file_grp, self.image_grp)
             if file_id == input_file.ID:
-                file_id = concat_padded(FILEGRP_IMG, n)
+                file_id = concat_padded(self.image_grp, n)
             
             pcgts = page_from_file(self.workspace.download_file(input_file))
             page_id = pcgts.pcGtsId or input_file.pageId or input_file.ID # (PageType has no id)
@@ -147,21 +153,19 @@ class OcropyClip(Processor):
                                          input_file.pageId, file_id + '_' + region.id + '_' + line.id)
             
             # update METS (add the PAGE file):
-            file_id = input_file.ID.replace(self.input_file_grp,
-                                            self.output_file_grp)
+            file_id = input_file.ID.replace(self.input_file_grp, self.page_grp)
             if file_id == input_file.ID:
-                file_id = concat_padded(self.output_file_grp, n)
-            file_path = os.path.join(self.output_file_grp,
-                                     file_id + '.xml')
+                file_id = concat_padded(self.page, n)
+            file_path = os.path.join(self.page_grp, file_id + '.xml')
             out = self.workspace.add_file(
                 ID=file_id,
-                file_grp=self.output_file_grp,
+                file_grp=self.page_grp,
                 pageId=input_file.pageId,
                 local_filename=file_path,
                 mimetype=MIMETYPE_PAGE,
                 content=to_xml(pcgts))
             LOG.info('created file ID: %s, file_grp: %s, path: %s',
-                     file_id, self.output_file_grp, out.local_filename)
+                     file_id, self.page_grp, out.local_filename)
     
     def process_segment(self, segment, neighbours, parent_image, parent_xywh, page_id, file_id):
         segment_xywh = xywh_from_points(segment.get_Coords().points)
@@ -206,6 +210,10 @@ class OcropyClip(Processor):
             clip_mask = array2pil(intruders)
             #parent_bin[intruders] = 0 # suppress in binary for next iteration
             segment_image.paste(background_image, mask=clip_mask) # suppress in raw image
+            if segment_image.mode in ['RGB', 'L', 'RGBA', 'LA']:
+                # for consumers that do not have to rely on our
+                # guessed background color, but can cope with transparency:
+                segment_image.putalpha(ImageOps.invert(clip_mask))
         # recrop segment into rectangle (also clipping with white):
         segment_image = crop_image(segment_image,
             box=(segment_xywh['x'] - parent_xywh['x'],
@@ -217,8 +225,8 @@ class OcropyClip(Processor):
             segment_image,
             file_id=file_id,
             page_id=page_id,
-            file_grp=FILEGRP_IMG)
+            file_grp=self.image_grp)
         # update PAGE (reference the image file):
         segment.add_AlternativeImage(AlternativeImageType(
             filename=file_path,
-            comments='cropped,clipped'))
+            comments=parent_xywh['features'] + ',clipped'))
