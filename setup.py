@@ -43,7 +43,7 @@ setup(
         'pillow>=6.2.0',
         'matplotlib>3.0.0',
         'python-Levenshtein',
-        'calamari_ocr'
+        'calamari_ocr == 0.3.5'
     ],
     package_data={
         '': ['*.json', '*.yml', '*.yaml', '*.csv.gz', '*.jar'],
@@ -55,19 +55,20 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'ocrd-cis-align=ocrd_cis.align.cli:cis_ocrd_align',
-            'ocrd-cis-profile=ocrd_cis.profile.cli:cis_ocrd_profile',
-            'ocrd-cis-wer=ocrd_cis.wer.cli:cis_ocrd_wer',
+            'ocrd-cis-align=ocrd_cis.align.cli:ocrd_cis_align',
+            'ocrd-cis-profile=ocrd_cis.profile.cli:ocrd_cis_profile',
+            'ocrd-cis-wer=ocrd_cis.wer.cli:ocrd_cis_wer',
             'ocrd-cis-data=ocrd_cis.data.__main__:main',
-            'ocrd-cis-ocropy-binarize=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_binarize',
-            'ocrd-cis-ocropy-clip=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_clip',
-            'ocrd-cis-ocropy-denoise=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_denoise',
-            'ocrd-cis-ocropy-deskew=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_deskew',
-            'ocrd-cis-ocropy-dewarp=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_dewarp',
-            'ocrd-cis-ocropy-recognize=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_recognize',
-            'ocrd-cis-ocropy-rec=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_rec',
-            'ocrd-cis-ocropy-resegment=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_resegment',
-            'ocrd-cis-ocropy-segment=ocrd_cis.ocropy.cli:cis_ocrd_ocropy_segment',
+            'ocrd-cis-ocropy-binarize=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_binarize',
+            'ocrd-cis-ocropy-clip=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_clip',
+            'ocrd-cis-ocropy-denoise=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_denoise',
+            'ocrd-cis-ocropy-deskew=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_deskew',
+            'ocrd-cis-ocropy-dewarp=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_dewarp',
+            'ocrd-cis-ocropy-recognize=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_recognize',
+            'ocrd-cis-ocropy-rec=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_rec',
+            'ocrd-cis-ocropy-resegment=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_resegment',
+            'ocrd-cis-ocropy-segment=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_segment',
+            'ocrd-cis-ocropy-train=ocrd_cis.ocropy.cli:ocrd_cis_ocropy_train',
         ]
     },
 )
